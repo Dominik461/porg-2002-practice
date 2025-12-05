@@ -1,4 +1,5 @@
-add_library(Rendering VertexBuffer.cpp VertexBuffer.h
+add_library(Rendering 
+    VertexBuffer.cpp VertexBuffer.h
     IndexBuffer.cpp IndexBuffer.h 
     BufferLayout.h 
     VertexArray.cpp VertexArray.h 

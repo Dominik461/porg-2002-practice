@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.15)
 
 # Declare the name of the project and set it as 'PROG2002'. This command is used to set the project name
 # and optionally its version, description, and other attributes.
-project(PROG2002)
+project(PROG2002_PRACTICE)
 
 # Set the C++ standard to C++17 for all targets in the project. This variable denotes
 # the desired C++ standard version (e.g., 11, 14, 17, 20).
@@ -47,7 +47,7 @@ set(GLFW_VULKAN_STATIC OFF CACHE BOOL "" FORCE)
 add_subdirectory(external/glad)
 add_subdirectory(external/glfw)
 add_subdirectory(external/glm)
-add_subdirectory(external/tinyobjloader)
+#add_subdirectory(external/tinyobjloader)
 add_subdirectory(framework)
 
 # Create a header-only interface for the 'stb' library. Since 'stb' typically consists
@@ -55,5 +55,7 @@ add_subdirectory(framework)
 add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE external/stb)
 
+add_subdirectory(renderer)
 add_subdirectory(game)
+
 

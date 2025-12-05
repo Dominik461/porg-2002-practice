@@ -1,3 +1,6 @@
+#ifndef GEOMETRICTOOLS_H_
+#define GEOMETRICTOOLS_H_
+
 #include <array>
 #include <vector>
 #include <iostream>
@@ -7,7 +10,7 @@ namespace GeometricTools
     constexpr std::array<float, 3 * 2> UnitTriangle2D = {
         -0.5f, -0.5f,
         0.5f, -0.5f,
-        0.0f, 0.5f}; // [2,3]
+        0.0f, 0.5f }; // [2,3]
 
     constexpr std::array<float, 3 * 2 * 2> UnitSquare2D = {
         // triangle 1
@@ -17,7 +20,21 @@ namespace GeometricTools
         // triganle 2
         0.5f, 0.5f,
         -0.5f, 0.5f,
-        0.5f, -0.5f}; // [2,6]
+        0.5f, -0.5f 
+    }; // [2,6]
+
+    constexpr std::array<float, 11 * 4> UnitSquare3DWithTexCoordsVertices = {
+        // pos              // Normals        // T.C.     // Color
+        -0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // close left
+        -0.5f, 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // far left
+         0.5f, 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // far right
+         0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // close right
+    };
+
+    constexpr std::array<unsigned int, 3 * 2> UnitSquare3DWithTexCoordsIndices = {
+        0, 1, 2,
+        3, 0, 2,
+    };
 
     constexpr std::array<float, 3 * 4 * 6> UnitCube3DVertices = {
         // front
@@ -138,50 +155,50 @@ namespace GeometricTools
      * Where std::array<float, 3 * 3 * 2 * 3 * 4 * 6> -> VBO (vertex positions (3), normals(3), tex  coords(2) and color (3))
      * Where std::array<unsigned int, 3 * 2 * 6> -> EBO (triangle indices)
      * Default values returns a cube
-     * 
+     *
      * @param width scale on X axis
      * @param height scale on Y axis
      * @return pair with VBO and EBO
      */
-    inline std::pair<std::array<float, 3 * 3 * 2 * 3 * 4 * 6>, std::array<unsigned int, 3 * 2 * 6>> GetUnitCube3D(float width = 1.0f, float height = 1.0f)
+    inline std::pair<std::array<float, 11 * 4 * 6>, std::array<unsigned int, 3 * 2 * 6>> GetUnitCube3D(float width = 1.0f, float height = 1.0f)
     {
-        std::array<float, 3 * 3 * 2 * 3 * 4 * 6> VBO = {
+        std::array<float, 11 * 4 * 6> VBO = {
             // FRONT FACE (normal: 0, 0, 1)
-            // Positions                       // Normals           // TC        // Color
-            -0.5f/width, -0.5f/height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-left
-             0.5f/width, -0.5f/height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-right
-             0.5f/width,  0.5f/height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-right
-            -0.5f/width,  0.5f/height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-left
-                                                                                 
+            // Positions                           // Normals           // T.C.        // Color
+            -0.5f / width, -0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-left
+             0.5f / width, -0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-right
+             0.5f / width,  0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-right
+            -0.5f / width,  0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-left
+
             // BACK FACE (normal: 0, 0, -1)                                      
-             0.5f/width, -0.5f/height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-right
-            -0.5f/width, -0.5f/height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-left
-            -0.5f/width,  0.5f/height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-left
-             0.5f/width,  0.5f/height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-right
-                                                                                 
-            // TOP FACE(normal: 0, 1, 0)                                         
-            -0.5f/width,  0.5f/height,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Front-left
-             0.5f/width,  0.5f/height,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Front-right
-             0.5f/width,  0.5f/height, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Back-right
-            -0.5f/width,  0.5f/height, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Back-left
-                                                                                 
-            // BOTTOM FAE (normal: 0, -1, 0)                                     
-            -0.5f/width, -0.5f/height, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Back-left
-             0.5f/width, -0.5f/height, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Back-right
-             0.5f/width, -0.5f/height,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Front-right
-            -0.5f/width, -0.5f/height,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Front-left
-                                                                                 
-            // RIGHT FACE (normal: 1, 0, 0)                                      
-             0.5f/width, -0.5f/height,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-front
-             0.5f/width, -0.5f/height, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-back
-             0.5f/width,  0.5f/height, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-back
-             0.5f/width,  0.5f/height,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-front
-                                                                                 
-            // LEFT FACE(normal: -1, 0, 0)                                       
-            -0.5f/width, -0.5f/height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-back
-            -0.5f/width, -0.5f/height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-front
-            -0.5f/width,  0.5f/height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-front
-            -0.5f/width,  0.5f/height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-back
+             0.5f / width, -0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-right
+            -0.5f / width, -0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-left
+            -0.5f / width,  0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-left
+             0.5f / width,  0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-right
+
+             // TOP FACE(normal: 0, 1, 0)                                         
+             -0.5f / width,  0.5f / height,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Front-left
+              0.5f / width,  0.5f / height,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Front-right
+              0.5f / width,  0.5f / height, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Back-right
+             -0.5f / width,  0.5f / height, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Back-left
+
+             // BOTTOM FAE (normal: 0, -1, 0)                                     
+             -0.5f / width, -0.5f / height, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Back-left
+              0.5f / width, -0.5f / height, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Back-right
+              0.5f / width, -0.5f / height,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Front-right
+             -0.5f / width, -0.5f / height,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Front-left
+
+             // RIGHT FACE (normal: 1, 0, 0)                                      
+              0.5f / width, -0.5f / height,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-front
+              0.5f / width, -0.5f / height, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-back
+              0.5f / width,  0.5f / height, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-back
+              0.5f / width,  0.5f / height,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-front
+
+              // LEFT FACE(normal: -1, 0, 0)                                       
+              -0.5f / width, -0.5f / height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-back
+              -0.5f / width, -0.5f / height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-front
+              -0.5f / width,  0.5f / height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-front
+              -0.5f / width,  0.5f / height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-back
         };
 
         std::array<unsigned int, 6 * 3 * 2> EBO = {
@@ -246,19 +263,19 @@ namespace GeometricTools
 
                 // Create 4 vertices for this tile
                 // Bottom-left
-                vertices.insert(vertices.end(), {x, y - stepY});
+                vertices.insert(vertices.end(), { x, y - stepY });
                 // Bottom-right
-                vertices.insert(vertices.end(), {x + stepX, y - stepY});
+                vertices.insert(vertices.end(), { x + stepX, y - stepY });
                 // Top-right
-                vertices.insert(vertices.end(), {x + stepX, y});
+                vertices.insert(vertices.end(), { x + stepX, y });
                 // Top-left
-                vertices.insert(vertices.end(), {x, y});
+                vertices.insert(vertices.end(), { x, y });
 
                 // Create indices for 2 triangles that form this tile
                 // First triangle (bottom-left, bottom-right, top-left)
-                indices.insert(indices.end(), {vertexIndex, vertexIndex + 1, vertexIndex + 3});
+                indices.insert(indices.end(), { vertexIndex, vertexIndex + 1, vertexIndex + 3 });
                 // Second triangle (bottom-right, top-right, top-left)
-                indices.insert(indices.end(), {vertexIndex + 1, vertexIndex + 2, vertexIndex + 3});
+                indices.insert(indices.end(), { vertexIndex + 1, vertexIndex + 2, vertexIndex + 3 });
 
                 vertexIndex += 4; // Move to next set of 4 vertices
             }
@@ -321,3 +338,5 @@ namespace GeometricTools
     }
 
 }
+
+#endif // !GEOMETRICTOOLS_H_
