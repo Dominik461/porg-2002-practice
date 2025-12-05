@@ -1,2 +1,6 @@
 project(Framework)
+add_subdirectory(GLFWApplication)
 add_subdirectory(GeometricTools)
+add_subdirectory(Rendering)
+add_subdirectory(Projection)
+target_link_libraries(glad glfw stb)

@@ -130,6 +130,89 @@ namespace GeometricTools
         22, 23, 20  // Triangle 2
     };
 
+
+    /**
+     * @brief Creates a UnitCube3D with an aspect ratio of width:height
+     *
+     * Generates a std::pair<std::array<float, 3 * 3 * 2 * 3 * 4* 6>, std::array<unsigned int, 3 * 2 * 6>>
+     * Where std::array<float, 3 * 3 * 2 * 3 * 4 * 6> -> VBO (vertex positions (3), normals(3), tex  coords(2) and color (3))
+     * Where std::array<unsigned int, 3 * 2 * 6> -> EBO (triangle indices)
+     * Default values returns a cube
+     * 
+     * @param width scale on X axis
+     * @param height scale on Y axis
+     * @return pair with VBO and EBO
+     */
+    inline std::pair<std::array<float, 3 * 3 * 2 * 3 * 4 * 6>, std::array<unsigned int, 3 * 2 * 6>> GetUnitCube3D(float width = 1.0f, float height = 1.0f)
+    {
+        std::array<float, 3 * 3 * 2 * 3 * 4 * 6> VBO = {
+            // FRONT FACE (normal: 0, 0, 1)
+            // Positions                       // Normals           // TC        // Color
+            -0.5f/width, -0.5f/height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-left
+             0.5f/width, -0.5f/height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-right
+             0.5f/width,  0.5f/height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-right
+            -0.5f/width,  0.5f/height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-left
+                                                                                 
+            // BACK FACE (normal: 0, 0, -1)                                      
+             0.5f/width, -0.5f/height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-right
+            -0.5f/width, -0.5f/height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-left
+            -0.5f/width,  0.5f/height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-left
+             0.5f/width,  0.5f/height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-right
+                                                                                 
+            // TOP FACE(normal: 0, 1, 0)                                         
+            -0.5f/width,  0.5f/height,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Front-left
+             0.5f/width,  0.5f/height,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Front-right
+             0.5f/width,  0.5f/height, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Back-right
+            -0.5f/width,  0.5f/height, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Back-left
+                                                                                 
+            // BOTTOM FAE (normal: 0, -1, 0)                                     
+            -0.5f/width, -0.5f/height, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Back-left
+             0.5f/width, -0.5f/height, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Back-right
+             0.5f/width, -0.5f/height,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Front-right
+            -0.5f/width, -0.5f/height,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Front-left
+                                                                                 
+            // RIGHT FACE (normal: 1, 0, 0)                                      
+             0.5f/width, -0.5f/height,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-front
+             0.5f/width, -0.5f/height, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-back
+             0.5f/width,  0.5f/height, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-back
+             0.5f/width,  0.5f/height,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-front
+                                                                                 
+            // LEFT FACE(normal: -1, 0, 0)                                       
+            -0.5f/width, -0.5f/height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-back
+            -0.5f/width, -0.5f/height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-front
+            -0.5f/width,  0.5f/height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-front
+            -0.5f/width,  0.5f/height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-back
+        };
+
+        std::array<unsigned int, 6 * 3 * 2> EBO = {
+            // FRONT FACE
+            0, 1, 2,    // Triangle 1
+            2, 3, 0,    // Triangle 2
+
+            // BACK FACE
+            4, 5, 6,    // Triangle 1
+            6, 7, 4,    // Triangle 2
+
+            // TOP FACE
+            8, 9, 10,   // Triangle 1
+            10, 11, 8,  // Triangle 2
+
+            // BOTTOM FACE
+            12, 13, 14, // Triangle 1
+            14, 15, 12, // Triangle 2
+
+            // RIGHT FACE
+            16, 17, 18, // Triangle 1
+            18, 19, 16, // Triangle 2
+
+            // LEFT FACE
+            20, 21, 22, // Triangle 1
+            22, 23, 20  // Triangle 2
+        };
+
+        return std::make_pair(VBO, EBO);
+    }
+
     /**
      * @brief Creates a UnitGrid of dimension (divisionsX x divisionsY)
      *
