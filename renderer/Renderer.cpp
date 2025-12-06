@@ -82,7 +82,7 @@ void Renderer::draw(PerspectiveCamera camera, std::shared_ptr<GameObjectData> fl
 
 	renderFloor(floorData);
 	renderPlatofrm(platformDataList);
-	renderPlayer(playerData, playerMovement, applyGravity);
+	renderPlayer(playerData);
 }
 
 unsigned Renderer::shutdown()
