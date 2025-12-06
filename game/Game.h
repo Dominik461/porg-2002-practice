@@ -16,6 +16,8 @@ class Game : GLFWApplication
 	struct Player
 	{
 		std::shared_ptr<GameObjectData> data = std::make_shared<GameObjectData>();
+		glm::vec3 moveDir = glm::vec3(0.0f);
+		const float SPEED = 5.0f;
 		bool isGrounded = false;
 	};
 
@@ -31,6 +33,7 @@ class Game : GLFWApplication
 
 	const int WINDOW_HEIGHT = 600;
 	const int WINDOW_WIDTH = 800;
+	const float GRAVITY = -9.0f;
 
 	GLFWwindow* m_window;
 	double m_startTime;
@@ -38,8 +41,10 @@ class Game : GLFWApplication
 	float m_deltaTime;
 	float m_lastFrameTime;
 
+	bool jump = false;
+
 	PerspectiveCamera camera;
-	glm::vec3 cameraPos = glm::vec3(0.0f, 5.0f, -5.0f);
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 15.0f);
 
 	std::shared_ptr<Renderer> m_renderer;
 
@@ -57,9 +62,10 @@ class Game : GLFWApplication
 	void updateCamera();
 
 	bool checkCollison();
-
+	void movePlayer();
 	void handleInput();
 
+	void extractAxes(const glm::mat4& transform);
 public:
 	Game();
 

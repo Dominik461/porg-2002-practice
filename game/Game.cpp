@@ -4,8 +4,7 @@ Game::Game()
     : GLFWApplication("Exam Practice Application", "1.0"), m_window(nullptr),
     m_deltaTime(0.0f), m_lastFrameTime(0.0f), m_startTime(0.0f),
     m_renderer(nullptr)
-{
-}
+{}
 
 unsigned Game::Init()
 {
@@ -30,7 +29,11 @@ unsigned Game::Run() const
         const_cast<Game*>(this)->m_deltaTime = currentFrame - const_cast<Game*>(this)->m_lastFrameTime;
         const_cast<Game*>(this)->m_lastFrameTime = currentFrame;
 
-        m_renderer->draw(camera, m_floor->data, m_platformsData, m_player->data, m_player->isGrounded, m_deltaTime);
+        const_cast<Game*>(this)->handleInput();
+
+        const_cast<Game*>(this)->movePlayer();
+
+        m_renderer->draw(camera, m_floor->data, m_platformsData, m_player->data, m_deltaTime);
 
         // Swap buffers and poll events
         glfwSwapBuffers(m_window);
@@ -89,9 +92,6 @@ void Game::createPlayer()
     glm::vec3 transform = glm::vec3(0.0f, 0.0f, 0.0f);
     float rotationDeg = 0.0f;
 
-    //auto& verticesData = GeometricTools::UnitCube3D24WNormals;
-    //auto& indicesData = GeometricTools::UnitCube3DTopologyTriangles24;
-
     auto& cubeData = GeometricTools::GetUnitCube3D(1.0f, 1.0f);
     auto& verticesData = cubeData.first;
     auto& indicesData = cubeData.second;
@@ -102,8 +102,6 @@ void Game::createPlayer()
     m_player = std::make_shared<Player>();
 
     m_player->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
-   
-    m_player->data->position = glm::vec3(0.0f, 0.0f, 0.0f);
 
     for (float data : verticesData)
     {
@@ -135,9 +133,54 @@ void Game::createPlayer()
 
 void Game::createPlatforms()
 {
-    for (int i = 0; i <= 10; i++)
+    glm::vec3 scale = glm::vec3(1.0f);
+    glm::vec3 rotationVec = glm::vec3(1.0f, 0.0f, 0.0f);
+    
+    float rotationDeg = 0.0f;
+
+    for (int i = 0; i <= 1; i++)
     {
+        glm::vec3 transform = glm::vec3(6.0f, 0.0f, 0.0f);
         std::shared_ptr<Platform> platform = std::make_shared<Platform>();
+
+        auto& cubeData = GeometricTools::GetUnitCube3D(1.0f, 2.0f);
+        auto& verticesData = cubeData.first;
+        auto& indicesData = cubeData.second;
+
+        std::vector<float> vertices;
+        std::vector<unsigned int> indices;
+
+        platform->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
+
+        
+
+        for (float data : verticesData)
+        {
+            vertices.push_back(data);
+        }
+
+        for (unsigned int data : indicesData)
+        {
+            indices.push_back(data);
+        }
+
+        // Create VAO and buffers using VertexBuffer and IndexBuffer classes
+        platform->data->objectIBO = std::make_shared<IndexBuffer>(indices.data(), indices.size());
+        platform->data->bufferlayout = BufferLayout({ {ShaderDataType::Float3, "position"}, {ShaderDataType::Float3, "normals"}, {ShaderDataType::Float2, "tcoords"}, {ShaderDataType::Float3, "color"} });
+
+        platform->data->objectVBO = std::make_shared<VertexBuffer>(vertices.data(), vertices.size() * sizeof(vertices[0]));
+        platform->data->objectVBO->SetLayout(platform->data->bufferlayout);
+
+        platform->data->objectVAO = std::make_shared<VertexArray>();
+        platform->data->objectVAO->Bind();
+        platform->data->objectVAO->SetIndexBuffer(platform->data->objectIBO);
+        platform->data->objectVAO->AddVertexBuffer(platform->data->objectVBO);
+
+        // Unbind everything
+        platform->data->objectVBO->Unbind();
+        platform->data->objectIBO->Unbind();
+        platform->data->objectVAO->Unbind();
+
         m_platforms.push_back(platform);
         m_platformsData.push_back(platform->data);
 
@@ -149,7 +192,7 @@ void Game::createFloor()
 
     glm::vec3 scale = glm::vec3(4.0f);
     glm::vec3 rotationVec = glm::vec3(1.0f, 0.0f, 0.0f);
-    glm::vec3 transform = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 transform = glm::vec3(0.0f, -3.0f, 0.0f);
     float rotationDeg = 0.0f;
 
     auto& verticesData = GeometricTools::UnitSquare3DWithTexCoordsVertices;
@@ -161,8 +204,6 @@ void Game::createFloor()
     m_floor = std::make_shared<Floor>();
 
     m_floor->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
-
-    m_floor->data->position = glm::vec3(0.0f, -3.0f, 0.0f);
 
     for each(float data in verticesData)
     {
@@ -206,43 +247,86 @@ void Game::createCamera()
 
 void Game::updateCamera()
 {
+    cameraPos.x = m_player->moveDir.x;
+    cameraPos.y = m_player->moveDir.y;
+
+    camera.SetLookAt(m_player->moveDir);
+    camera.SetPosition(cameraPos);
 }
 
+//Check if the player is touching ground
 bool Game::checkCollison()
 {
+    if (m_player->isGrounded)
+        m_player->isGrounded = false;
+
     return false;
 }
 
+
 void Game::handleInput()
 {
+    jump = false;
     // Exit when Q key is pressed
     if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(m_window, true);
         return;
     }
-
-    // Camera rotation
+    // Left
     if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
     {
-
-
-        updateCamera();
-        return;
+        m_player->moveDir.x -= m_player->SPEED * m_deltaTime;
+        checkCollison();
     }
+    // Right
     if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
     {
-
-        updateCamera();
-        return;
+        m_player->moveDir.x += m_player->SPEED * m_deltaTime;
+        checkCollison();
     }
-
-    // Camera Zoom
+    // Up
     if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
     {
-
-        updateCamera();
-        return;
+        // Double speed for the jump
+        m_player->moveDir.y += m_player-> SPEED * 2 * m_deltaTime;
+        jump = true;
+        checkCollison();
     }
 
+
+}
+
+
+void Game::movePlayer()
+{
+    glm::vec3 scale = glm::vec3(1.0f);
+    glm::vec3 rotationVec = glm::vec3(1.0f, 0.0f, 0.0f);
+    float rotationDeg = 0.0f;
+
+    if (!m_player->isGrounded && !jump)
+    {
+        m_player->moveDir.y += GRAVITY * m_deltaTime;
+    }
+
+    m_player->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, m_player->moveDir);
+    std::cout << "........................................................" << std::endl;
+    extractAxes(m_player->data->modelMatrix);
+
+    // Update the camera position and where it should look at
+    updateCamera();
+}
+
+// Just for checking matrix math
+void Game::extractAxes(const glm::mat4& transform) {
+    // Extract the basis vectors
+    glm::vec3 right = glm::vec3(transform[0]);
+    glm::vec3 up = glm::vec3(transform[1]);
+    glm::vec3 forward = glm::vec3(transform[2]);
+    glm::vec3 position = glm::vec3(transform[3]);
+
+    std::cout << "Right (X-axis):   (" << right.x << ", " << right.y << ", " << right.z << ")\n";
+    std::cout << "Up (Y-axis):      (" << up.x << ", " << up.y << ", " << up.z << ")\n";
+    std::cout << "Forward (Z-axis): (" << forward.x << ", " << forward.y << ", " << forward.z << ")\n";
+    std::cout << "Position:         (" << position.x << ", " << position.y << ", " << position.z << ")\n";
 }

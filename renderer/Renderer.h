@@ -19,14 +19,14 @@ class Renderer
 	void setupShaders();
 
 	void renderPlatofrm(std::vector<std::shared_ptr<GameObjectData>> platformDataList);
-	void renderPlayer(std::shared_ptr <GameObjectData>& playerData, bool applyGravity);
+	void renderPlayer(std::shared_ptr <GameObjectData>& playerData);
 	void renderFloor(std::shared_ptr <GameObjectData> floorData);
 
 public:
 	Renderer();
 
 	unsigned init();
-	void draw(PerspectiveCamera camera, std::shared_ptr <GameObjectData> floorData, std::vector<std::shared_ptr<GameObjectData>> platformDataList, std::shared_ptr <GameObjectData>& playerData, bool applyGravity, float deltaTime);
+	void draw(PerspectiveCamera camera, std::shared_ptr <GameObjectData> floorData, std::vector<std::shared_ptr<GameObjectData>> platformDataList, std::shared_ptr <GameObjectData>& playerData, float deltaTime);
 	unsigned shutdown();
 };
 

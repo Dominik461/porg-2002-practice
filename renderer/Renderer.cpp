@@ -14,14 +14,22 @@ void Renderer::setupShaders()
 
 void Renderer::renderPlatofrm(std::vector<std::shared_ptr<GameObjectData>> platformDataList)
 {
-	//m_worldShader->Bind();
+	m_worldShader->Bind();
+
+	for (auto& platform : platformDataList)
+	{
+		platform->objectVAO->Bind();
+		platform->objectIBO->Bind();
+		m_worldShader->UploadUniformMat4("u_Model", platform->modelMatrix);
+		RenderCommands::DrawIndex(platform->objectVAO, GL_TRIANGLES);
+		platform->objectVAO->Unbind();
+	}
 
 
-
-	//m_worldShader->Unbind();
+	m_worldShader->Unbind();
 }
 
-void Renderer::renderPlayer(std::shared_ptr <GameObjectData>& playerData, bool applyGravity)
+void Renderer::renderPlayer(std::shared_ptr <GameObjectData>& playerData)
 {
 	m_playerShader->Bind();
 
@@ -57,7 +65,7 @@ unsigned Renderer::init()
 	return 0;
 }
 
-void Renderer::draw(PerspectiveCamera camera, std::shared_ptr<GameObjectData> floorData, std::vector<std::shared_ptr<GameObjectData>> platformDataList, std::shared_ptr<GameObjectData>& playerData, bool applyGravity, float deltaTime)
+void Renderer::draw(PerspectiveCamera camera, std::shared_ptr<GameObjectData> floorData, std::vector<std::shared_ptr<GameObjectData>> platformDataList, std::shared_ptr<GameObjectData>& playerData, float deltaTime)
 {
 	RenderCommands::Clear();
 	RenderCommands::SetSolidMode();
@@ -73,8 +81,8 @@ void Renderer::draw(PerspectiveCamera camera, std::shared_ptr<GameObjectData> fl
 	m_playerShader->Unbind();
 
 	renderFloor(floorData);
-	//renderPlatofrm(platformDataList);
-	renderPlayer(playerData, applyGravity);
+	renderPlatofrm(platformDataList);
+	renderPlayer(playerData, playerMovement, applyGravity);
 }
 
 unsigned Renderer::shutdown()

@@ -9,7 +9,6 @@
 
 struct GameObjectData
 {
-	glm::vec3 position = glm::vec3(0.0f);
     std::shared_ptr<VertexBuffer> objectVBO;
     std::shared_ptr<VertexArray> objectVAO;
     std::shared_ptr<IndexBuffer> objectIBO;
