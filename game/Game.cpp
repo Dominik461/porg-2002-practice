@@ -6,10 +6,13 @@ Game::Game()
     m_renderer(nullptr)
 {}
 
-unsigned Game::Init()
-{
-    if (!initializeOpenGL())
+unsigned Game::init()
+{   
+    if (!getIsOpenGLInitialized())
         return 1;
+
+    std::cout << "HEHEHEHEHE" << std::endl;
+    m_window = getWindow();
 
     m_renderer = std::make_shared<Renderer>();
 
@@ -21,17 +24,17 @@ unsigned Game::Init()
     return 0;
 }
 
-unsigned Game::Run() const
+unsigned Game::run()
 {
     while (!glfwWindowShouldClose(m_window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
-        const_cast<Game*>(this)->m_deltaTime = currentFrame - const_cast<Game*>(this)->m_lastFrameTime;
-        const_cast<Game*>(this)->m_lastFrameTime = currentFrame;
+        m_deltaTime = currentFrame - m_lastFrameTime;
+        m_lastFrameTime = currentFrame;
 
-        const_cast<Game*>(this)->handleInput();
+        handleInput();
 
-        const_cast<Game*>(this)->movePlayer();
+        movePlayer();
 
         m_renderer->draw(camera, m_floor->data, m_platformsData, m_player->data, m_deltaTime);
 
@@ -42,47 +45,8 @@ unsigned Game::Run() const
     return 0;
 }
 
-void Game::Shutdown()
+void Game::shutdown()
 {
-}
-
-
-bool Game::initializeOpenGL()
-{
-    // Initialize GLFW
-    if (!glfwInit())
-    {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
-        return false;
-    }
-
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    m_window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, GetName().c_str(), nullptr, nullptr);
-    if (!m_window)
-    {
-        std::cerr << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-        return false;
-    }
-
-    glfwMakeContextCurrent(m_window);
-    glfwSetWindowUserPointer(m_window, this);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
-        return false;
-    }
-
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    glEnable(GL_DEPTH_TEST);
-
-    std::cout << "OpenGL init complete" << std::endl;
-
-    return true;
 }
 
 void Game::createPlayer()
@@ -92,32 +56,19 @@ void Game::createPlayer()
     glm::vec3 transform = glm::vec3(0.0f, 0.0f, 0.0f);
     float rotationDeg = 0.0f;
 
-    auto& cubeData = GeometricTools::GetUnitCube3D(1.0f, 1.0f);
-    auto& verticesData = cubeData.first;
-    auto& indicesData = cubeData.second;
-
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
+    auto cubeData = GeometricTools::GetUnitCube3D(1.0f, 1.0f);
+    auto verticesData = cubeData.first;
+    auto indicesData = cubeData.second;
 
     m_player = std::make_shared<Player>();
 
     m_player->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
 
-    for (float data : verticesData)
-    {
-        vertices.push_back(data);
-    }
-
-    for (unsigned int data : indicesData)
-    {
-        indices.push_back(data);
-    }
-
     // Create VAO and buffers using VertexBuffer and IndexBuffer classes
-    m_player->data->objectIBO = std::make_shared<IndexBuffer>(indices.data(), indices.size());
+    m_player->data->objectIBO = std::make_shared<IndexBuffer>(indicesData.data(), indicesData.size());
     m_player->data->bufferlayout = BufferLayout({ {ShaderDataType::Float3, "position"}, {ShaderDataType::Float3, "normals"}, {ShaderDataType::Float2, "tcoords"}, {ShaderDataType::Float3, "color"} });
 
-    m_player->data->objectVBO = std::make_shared<VertexBuffer>(vertices.data(), vertices.size() * sizeof(vertices[0]));
+    m_player->data->objectVBO = std::make_shared<VertexBuffer>(verticesData.data(), verticesData.size() * sizeof(verticesData[0]));
     m_player->data->objectVBO->SetLayout(m_player->data->bufferlayout);
 
     m_player->data->objectVAO = std::make_shared<VertexArray>();
@@ -125,10 +76,6 @@ void Game::createPlayer()
     m_player->data->objectVAO->SetIndexBuffer(m_player->data->objectIBO);
     m_player->data->objectVAO->AddVertexBuffer(m_player->data->objectVBO);
 
-    // Unbind everything
-    m_player->data->objectVBO->Unbind();
-    m_player->data->objectIBO->Unbind();
-    m_player->data->objectVAO->Unbind();
 }
 
 void Game::createPlatforms()
@@ -176,10 +123,6 @@ void Game::createPlatforms()
         platform->data->objectVAO->SetIndexBuffer(platform->data->objectIBO);
         platform->data->objectVAO->AddVertexBuffer(platform->data->objectVBO);
 
-        // Unbind everything
-        platform->data->objectVBO->Unbind();
-        platform->data->objectIBO->Unbind();
-        platform->data->objectVAO->Unbind();
 
         m_platforms.push_back(platform);
         m_platformsData.push_back(platform->data);
@@ -205,12 +148,12 @@ void Game::createFloor()
 
     m_floor->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
 
-    for each(float data in verticesData)
+    for(float data : verticesData)
     {
         vertices.push_back(data);
     }
 
-    for each(float data in indicesData)
+    for(float data : indicesData)
     {
         indices.push_back(data);
     }
@@ -226,10 +169,6 @@ void Game::createFloor()
     m_floor->data->objectVAO->SetIndexBuffer(m_floor->data->objectIBO);
     m_floor->data->objectVAO->AddVertexBuffer(m_floor->data->objectVBO);
 
-    // Unbind everything
-    m_floor->data->objectVBO->Unbind();
-    m_floor->data->objectIBO->Unbind();
-    m_floor->data->objectVAO->Unbind();
 }
 
 void Game::createCamera()
@@ -289,7 +228,7 @@ void Game::handleInput()
     if (glfwGetKey(m_window, GLFW_KEY_SPACE) == GLFW_PRESS || glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
     {
         // Double speed for the jump
-        m_player->moveDir.y += m_player-> SPEED * 2 * m_deltaTime;
+        m_player->moveDir.y += m_player->JUMPSPEED * m_deltaTime;
         jump = true;
         checkCollison();
     }

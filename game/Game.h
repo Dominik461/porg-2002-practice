@@ -8,8 +8,6 @@
 #include "PerspectiveCamera.h"
 #include "MatrixOperations.h"
 #include "glm/glm.hpp"
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
 
 class Game : GLFWApplication
 {
@@ -18,6 +16,7 @@ class Game : GLFWApplication
 		std::shared_ptr<GameObjectData> data = std::make_shared<GameObjectData>();
 		glm::vec3 moveDir = glm::vec3(0.0f);
 		const float SPEED = 5.0f;
+		const float JUMPSPEED = 15.0f;
 		bool isGrounded = false;
 	};
 
@@ -31,8 +30,7 @@ class Game : GLFWApplication
 		std::shared_ptr<GameObjectData> data = std::make_shared<GameObjectData>();
 	};
 
-	const int WINDOW_HEIGHT = 600;
-	const int WINDOW_WIDTH = 800;
+private:
 	const float GRAVITY = -9.0f;
 
 	GLFWwindow* m_window;
@@ -53,8 +51,6 @@ class Game : GLFWApplication
 	std::vector< std::shared_ptr<Platform>> m_platforms;
 	std::vector< std::shared_ptr<GameObjectData>> m_platformsData;
 
-	bool initializeOpenGL();
-
 	void createPlayer();
 	void createPlatforms();
 	void createFloor();
@@ -69,12 +65,9 @@ class Game : GLFWApplication
 public:
 	Game();
 
-	unsigned Init() override;
-	unsigned Run() const override;
-	void Shutdown() override;
-
-
-	GLFWwindow* getWindow() const { return m_window; }
+	unsigned init() override;
+	unsigned run() override;
+	void shutdown() override;
 };
 
 
