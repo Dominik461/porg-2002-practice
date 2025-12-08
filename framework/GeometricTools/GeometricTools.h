@@ -4,15 +4,21 @@
 #include <array>
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include <cmath>
+#include "glm/glm.hpp"
+#include "glm/gtc/constants.hpp"
 
 namespace GeometricTools
 {
-    constexpr std::array<float, 3 * 2> UnitTriangle2D = {
+
+
+    inline std::array<float, 3 * 2> UnitTriangle2D = {
         -0.5f, -0.5f,
         0.5f, -0.5f,
         0.0f, 0.5f }; // [2,3]
 
-    constexpr std::array<float, 3 * 2 * 2> UnitSquare2D = {
+    inline std::array<float, 3 * 2 * 2> UnitSquare2D = {
         // triangle 1
         -0.5f, -0.5f,
         -0.5f, 0.5f,
@@ -23,7 +29,7 @@ namespace GeometricTools
         0.5f, -0.5f 
     }; // [2,6]
 
-    constexpr std::array<float, 11 * 4> UnitSquare3DWithTexCoordsVertices = {
+    inline std::array<float, 11 * 4> UnitSquare3DWithTexCoordsVertices = {
         // pos              // Normals        // T.C.     // Color
         -0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // close left
         -0.5f, 0.0f,  0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // far left
@@ -31,12 +37,12 @@ namespace GeometricTools
          0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, // close right
     };
 
-    constexpr std::array<unsigned int, 3 * 2> UnitSquare3DWithTexCoordsIndices = {
+    inline std::array<unsigned int, 3 * 2> UnitSquare3DWithTexCoordsIndices = {
         0, 1, 2,
         3, 0, 2,
     };
 
-    constexpr std::array<float, 3 * 4 * 6> UnitCube3DVertices = {
+    inline std::array<float, 3 * 4 * 6> UnitCube3DVertices = {
         // front
         -0.5,  0.5,  0.5,
         -0.5, -0.5,  0.5,
@@ -69,7 +75,7 @@ namespace GeometricTools
         0.5, -0.5,  0.5,
     };
 
-    constexpr std::array<int, 3 * 2 * 6> UnitCube3DIndices = {
+    inline std::array<unsigned int, 3 * 2 * 6> UnitCube3DIndices = {
         // first triangle    second triangle
             0, 1, 2,          2, 3, 0,       // front
             6, 5, 4,          4, 7, 6,       // back
@@ -81,7 +87,7 @@ namespace GeometricTools
 
     // Cube with 24 vertices (each vertex repeated 3 times for each face it participates in)
     // Each vertex has: position (x,y,z) + normal (nx,ny,nz) = 6 floats
-    constexpr std::array<float, 3 * 24 * 2> UnitCube3D24WNormals = {
+    inline std::array<float, 3 * 24 * 2> UnitCube3D24WNormals = {
         // FRONT FACE (normal: 0, 0, 1)
         // Positions          // Normals
         -0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  // Bottom-left
@@ -121,7 +127,7 @@ namespace GeometricTools
     };
 
     // Topology indices for 24-vertex cube (6 faces * 2 triangles * 3 vertices = 36 indices)
-    constexpr std::array<unsigned int, 6 * 3 * 2> UnitCube3DTopologyTriangles24 = {
+    inline std::array<unsigned int, 6 * 3 * 2> UnitCube3DTopologyTriangles24 = {
         // FRONT FACE
         0, 1, 2,    // Triangle 1
         2, 3, 0,    // Triangle 2
@@ -160,45 +166,50 @@ namespace GeometricTools
      * @param height scale on Y axis
      * @return pair with VBO and EBO
      */
-    inline std::pair<std::array<float, 11 * 4 * 6>, std::array<unsigned int, 3 * 2 * 6>> GetUnitCube3D(float width = 1.0f, float height = 1.0f)
+    inline std::pair<std::array<float, 11 * 4 * 6>, std::array<unsigned int, 3 * 2 * 6>> GetUnitCube3D(float width = 1.0f, float height = 1.0f, float r = 1.0f, float g = 1.0f, float b = 1.0f)
     {
+        r = std::clamp(r, 0.0f, 1.0f);
+        g = std::clamp(g, 0.0f, 1.0f);
+        b = std::clamp(b, 0.0f, 1.0f);
+
+
         std::array<float, 11 * 4 * 6> VBO = {
             // FRONT FACE (normal: 0, 0, 1)
             // Positions                           // Normals           // T.C.        // Color
-            -0.5f / width, -0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-left
-             0.5f / width, -0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-right
-             0.5f / width,  0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-right
-            -0.5f / width,  0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-left
+            -0.5f / width, -0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 0.0f,  r, g, b,  // Bottom-left
+             0.5f / width, -0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 0.0f,  r, g, b,  // Bottom-right
+             0.5f / width,  0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  1.0f, 1.0f,  r, g, b,  // Top-right
+            -0.5f / width,  0.5f / height,  0.5f,  0.0f,  0.0f,  1.0f,  0.0f, 1.0f,  r, g, b,  // Top-left
 
             // BACK FACE (normal: 0, 0, -1)                                      
-             0.5f / width, -0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-right
-            -0.5f / width, -0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-left
-            -0.5f / width,  0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-left
-             0.5f / width,  0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-right
+             0.5f / width, -0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,  r, g, b,  // Bottom-right
+            -0.5f / width, -0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,  r, g, b,  // Bottom-left
+            -0.5f / width,  0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,  r, g, b,  // Top-left
+             0.5f / width,  0.5f / height, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,  r, g, b,  // Top-right
 
              // TOP FACE(normal: 0, 1, 0)                                         
-             -0.5f / width,  0.5f / height,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Front-left
-              0.5f / width,  0.5f / height,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Front-right
-              0.5f / width,  0.5f / height, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Back-right
-             -0.5f / width,  0.5f / height, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Back-left
+             -0.5f / width,  0.5f / height,  0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 0.0f,  r, g, b,  // Front-left
+              0.5f / width,  0.5f / height,  0.5f, 0.0f,  1.0f,  0.0f,  1.0f, 0.0f,  r, g, b,  // Front-right
+              0.5f / width,  0.5f / height, -0.5f, 0.0f,  1.0f,  0.0f,  1.0f, 1.0f,  r, g, b,  // Back-right
+             -0.5f / width,  0.5f / height, -0.5f, 0.0f,  1.0f,  0.0f,  0.0f, 1.0f,  r, g, b,  // Back-left
 
              // BOTTOM FAE (normal: 0, -1, 0)                                     
-             -0.5f / width, -0.5f / height, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Back-left
-              0.5f / width, -0.5f / height, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Back-right
-              0.5f / width, -0.5f / height,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Front-right
-             -0.5f / width, -0.5f / height,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Front-left
+             -0.5f / width, -0.5f / height, -0.5f, 0.0f, -1.0f,  0.0f,  0.0f, 0.0f,  r, g, b,  // Back-left
+              0.5f / width, -0.5f / height, -0.5f, 0.0f, -1.0f,  0.0f,  1.0f, 0.0f,  r, g, b,  // Back-right
+              0.5f / width, -0.5f / height,  0.5f, 0.0f, -1.0f,  0.0f,  1.0f, 1.0f,  r, g, b,  // Front-right
+             -0.5f / width, -0.5f / height,  0.5f, 0.0f, -1.0f,  0.0f,  0.0f, 1.0f,  r, g, b,  // Front-left
 
              // RIGHT FACE (normal: 1, 0, 0)                                      
-              0.5f / width, -0.5f / height,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-front
-              0.5f / width, -0.5f / height, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-back
-              0.5f / width,  0.5f / height, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-back
-              0.5f / width,  0.5f / height,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-front
+              0.5f / width, -0.5f / height,  0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  r, g, b,  // Bottom-front
+              0.5f / width, -0.5f / height, -0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  r, g, b,  // Bottom-back
+              0.5f / width,  0.5f / height, -0.5f, 1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  r, g, b,  // Top-back
+              0.5f / width,  0.5f / height,  0.5f, 1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  r, g, b,  // Top-front
 
               // LEFT FACE(normal: -1, 0, 0)                                       
-              -0.5f / width, -0.5f / height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-back
-              -0.5f / width, -0.5f / height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,  1.0f, 1.0f, 1.0f,  // Bottom-front
-              -0.5f / width,  0.5f / height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-front
-              -0.5f / width,  0.5f / height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,  1.0f, 1.0f, 1.0f,  // Top-back
+              -0.5f / width, -0.5f / height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f, r, g, b,  // Bottom-back
+              -0.5f / width, -0.5f / height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f, r, g, b,  // Bottom-front
+              -0.5f / width,  0.5f / height,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f, r, g, b,  // Top-front
+              -0.5f / width,  0.5f / height, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f, r, g, b,  // Top-back
         };
 
         std::array<unsigned int, 6 * 3 * 2> EBO = {
@@ -241,21 +252,21 @@ namespace GeometricTools
      * @param divisionsY Number of divisions along Y axis
      * @return pair with VBO and EBO
      */
-    inline std::pair<std::vector<float>, std::vector<int>> GenerateUnitGrid2D(int divisionsX, int divisionsY)
+    inline std::pair<std::vector<float>, std::vector<unsigned int>> GenerateUnitGrid2D(int divisionsX, int divisionsY)
     {
         std::vector<float> vertices;
-        std::vector<int> indices;
+        std::vector<unsigned int> indices;
 
         // Calculate spacing between tiles
         const float stepX = 1.0f / divisionsX;
         const float stepY = 1.0f / divisionsY;
 
-        int vertexIndex = 0;
+        unsigned int vertexIndex = 0;
 
         // Create separate vertices for each tile (no sharing between tiles)
-        for (int row = 0; row < divisionsY; ++row)
+        for (unsigned int row = 0; row < divisionsY; ++row)
         {
-            for (int col = 0; col < divisionsX; ++col)
+            for (unsigned int col = 0; col < divisionsX; ++col)
             {
                 // Calculate tile position
                 float x = -0.5f + row * stepX;
@@ -284,10 +295,10 @@ namespace GeometricTools
         return std::make_pair(vertices, indices);
     }
 
-    inline std::pair<std::vector<float>, std::vector<int>> GenerateUnitGrid2DWTCoords(int divisionsX, int divisionsY)
+    inline std::pair<std::vector<float>, std::vector<unsigned int>> GenerateUnitGrid2DWTCoords(int divisionsX, int divisionsY)
     {
         std::vector<float> vertices;
-        std::vector<int> indices;
+        std::vector<unsigned int> indices;
 
         // Calculate spacing between tiles
         const float stepX = 1.0f / divisionsX;
@@ -295,7 +306,7 @@ namespace GeometricTools
 
         float s, t;
 
-        int vertexIndex = 0;
+        unsigned int vertexIndex = 0;
 
         // Create separate vertices for each tile (no sharing between tiles)
         for (int row = 0; row < divisionsY; ++row)
@@ -337,6 +348,158 @@ namespace GeometricTools
         return std::make_pair(vertices, indices);
     }
 
-}
 
+    // Generate a UV sphere (default size = 1.0, from -0.5 to 0.5)
+    inline std::pair<std::vector<float>, std::vector<unsigned int>> CreateSphere(float size = 1.0f, unsigned int segments = 32, unsigned int rings = 16,
+        glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f)) 
+
+    {
+        std::vector<float> vertices;
+        std::vector<unsigned int> indices;
+        float radius = size * 0.5f;  // Convert size to radius
+
+
+        // Generate vertices
+        for (unsigned int ring = 0; ring <= rings; ++ring) {
+            float phi = glm::pi<float>() * static_cast<float>(ring) / static_cast<float>(rings);
+            float y = radius * std::cos(phi);
+            float ringRadius = radius * std::sin(phi);
+
+            for (unsigned int seg = 0; seg <= segments; ++seg) {
+                float theta = 2.0f * glm::pi<float>() * static_cast<float>(seg) / static_cast<float>(segments);
+
+                // Position
+                float x = ringRadius * std::cos(theta);
+                float z = ringRadius * std::sin(theta);
+                glm::vec3 position(x, y, z);
+
+                // Normal (normalized position for sphere centered at origin)
+                glm::vec3 normal = glm::normalize(position);
+
+                // Texture coordinates
+                float u = static_cast<float>(seg) / static_cast<float>(segments);
+                float v = static_cast<float>(ring) / static_cast<float>(rings);
+                glm::vec2 texCoords(u, v);
+
+                vertices.push_back(position.x);
+                vertices.push_back(position.y);
+                vertices.push_back(position.z);
+                vertices.push_back(normal.x);
+                vertices.push_back(normal.y);
+                vertices.push_back(normal.z);
+                vertices.push_back(texCoords[0]);
+                vertices.push_back(texCoords[1]);
+                vertices.push_back(color.r);
+                vertices.push_back(color.g);
+                vertices.push_back(color.b);
+            }
+        }
+
+        // Generate indices
+        for (unsigned int ring = 0; ring < rings; ++ring) {
+            for (unsigned int seg = 0; seg < segments; ++seg) {
+                unsigned int current = ring * (segments + 1) + seg;
+                unsigned int next = current + segments + 1;
+
+                // First triangle
+                indices.push_back(current);
+                indices.push_back(next);
+                indices.push_back(current + 1);
+
+                // Second triangle
+                indices.push_back(current + 1);
+                indices.push_back(next);
+                indices.push_back(next + 1);
+            }
+        }
+
+        return std::make_pair(vertices, indices);
+    }
+
+    inline std::pair<std::vector<float>, std::vector<unsigned int>> CreateTetrahedron(float size = 1.0f, glm::vec3& color = glm::vec3(1.0f, 1.0f, 1.0f))
+    {
+        std::vector<float> vertices;
+        std::vector<unsigned int> indices;
+
+        // Calculate vertices of a regular tetrahedron with top point at +Y
+        float h = size * std::sqrt(2.0f / 3.0f);  // Height of tetrahedron
+        float r = size * std::sqrt(3.0f) / 3.0f;  // Radius of base circle
+
+        // Four vertices of the tetrahedron (already centered)
+        glm::vec3 positions[4] = {
+            glm::vec3(0.0f, h * 0.5f, 0.0f),                                  // Top vertex (positive Y)
+            glm::vec3(-r, -h * 0.5f, 0.0f),                                   // Base vertex 1
+            glm::vec3(r * 0.5f, -h * 0.5f, -r * std::sqrt(3.0f) * 0.5f),      // Base vertex 2
+            glm::vec3(r * 0.5f, -h * 0.5f, r * std::sqrt(3.0f) * 0.5f)        // Base vertex 3
+        };
+
+        // Define the 4 faces (each face is a triangle)
+        // Each row represents a face with 3 vertex indices
+        unsigned int faces[4][3] = {
+            {0, 1, 2},  // Face 0
+            {0, 3, 1},  // Face 1
+            {0, 2, 3},  // Face 2
+            {1, 3, 2}   // Face 3
+        };
+
+        // Generate vertices for each face (with proper normals)
+        for (int face = 0; face < 4; ++face) {
+            // Get the three vertices of this face
+            glm::vec3 v0 = positions[faces[face][0]];
+            glm::vec3 v1 = positions[faces[face][1]];
+            glm::vec3 v2 = positions[faces[face][2]];
+
+            // Calculate face normal
+            glm::vec3 edge1 = v1 - v0;
+            glm::vec3 edge2 = v2 - v0;
+            glm::vec3 normal = glm::normalize(glm::cross(edge1, edge2));
+
+            // Add three vertices for this face
+            vertices.push_back(v0.x);
+            vertices.push_back(v0.y);
+            vertices.push_back(v0.z);
+            vertices.push_back(normal.x);
+            vertices.push_back(normal.y);
+            vertices.push_back(normal.z);
+            vertices.push_back(0.0f);
+            vertices.push_back(0.0f);
+            vertices.push_back(color.r);
+            vertices.push_back(color.g);
+            vertices.push_back(color.b);
+
+            vertices.push_back(v1.x);
+            vertices.push_back(v1.y);
+            vertices.push_back(v1.z);
+            vertices.push_back(normal.x);
+            vertices.push_back(normal.y);
+            vertices.push_back(normal.z);
+            vertices.push_back(1.0f);
+            vertices.push_back(0.0f);
+            vertices.push_back(color.r);
+            vertices.push_back(color.g);
+            vertices.push_back(color.b);
+
+            vertices.push_back(v2.x);
+            vertices.push_back(v2.y);
+            vertices.push_back(v2.z);
+            vertices.push_back(normal.x);
+            vertices.push_back(normal.y);
+            vertices.push_back(normal.z);
+            vertices.push_back(0.5f);
+            vertices.push_back(1.0f);
+            vertices.push_back(color.r);
+            vertices.push_back(color.g);
+            vertices.push_back(color.b);
+
+            // Add indices for this face
+            unsigned int baseIdx = face * 3;
+            indices.push_back(baseIdx);
+            indices.push_back(baseIdx + 1);
+            indices.push_back(baseIdx + 2);
+        }
+
+        return std::make_pair(vertices, indices);
+    }
+    
+}
 #endif // !GEOMETRICTOOLS_H_

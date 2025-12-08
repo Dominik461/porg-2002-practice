@@ -84,50 +84,91 @@ void Game::createPlatforms()
     glm::vec3 rotationVec = glm::vec3(1.0f, 0.0f, 0.0f);
     
     float rotationDeg = 0.0f;
+    auto cubeData = GeometricTools::GetUnitCube3D(0.2f, 1.0f);
 
-    for (int i = 0; i <= 1; i++)
-    {
-        glm::vec3 transform = glm::vec3(6.0f, 0.0f, 0.0f);
-        std::shared_ptr<Platform> platform = std::make_shared<Platform>();
-
-        auto& cubeData = GeometricTools::GetUnitCube3D(1.0f, 2.0f);
-        auto& verticesData = cubeData.first;
-        auto& indicesData = cubeData.second;
-
-        std::vector<float> vertices;
-        std::vector<unsigned int> indices;
-
-        platform->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
+    glm::vec3 transform = glm::vec3(-6.0f, 3.0f, 0.0f);
+    std::shared_ptr<Platform> platform = std::make_shared<Platform>();
 
         
-
-        for (float data : verticesData)
-        {
-            vertices.push_back(data);
-        }
-
-        for (unsigned int data : indicesData)
-        {
-            indices.push_back(data);
-        }
-
-        // Create VAO and buffers using VertexBuffer and IndexBuffer classes
-        platform->data->objectIBO = std::make_shared<IndexBuffer>(indices.data(), indices.size());
-        platform->data->bufferlayout = BufferLayout({ {ShaderDataType::Float3, "position"}, {ShaderDataType::Float3, "normals"}, {ShaderDataType::Float2, "tcoords"}, {ShaderDataType::Float3, "color"} });
-
-        platform->data->objectVBO = std::make_shared<VertexBuffer>(vertices.data(), vertices.size() * sizeof(vertices[0]));
-        platform->data->objectVBO->SetLayout(platform->data->bufferlayout);
-
-        platform->data->objectVAO = std::make_shared<VertexArray>();
-        platform->data->objectVAO->Bind();
-        platform->data->objectVAO->SetIndexBuffer(platform->data->objectIBO);
-        platform->data->objectVAO->AddVertexBuffer(platform->data->objectVBO);
+    auto& verticesData = cubeData.first;
+    auto& indicesData = cubeData.second;
 
 
-        m_platforms.push_back(platform);
-        m_platformsData.push_back(platform->data);
+    platform->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
 
-    }
+    // Create VAO and buffers using VertexBuffer and IndexBuffer classes
+    platform->data->objectIBO = std::make_shared<IndexBuffer>(indicesData.data(), indicesData.size());
+    platform->data->bufferlayout = BufferLayout({ {ShaderDataType::Float3, "position"}, {ShaderDataType::Float3, "normals"}, {ShaderDataType::Float2, "tcoords"}, {ShaderDataType::Float3, "color"} });
+
+    platform->data->objectVBO = std::make_shared<VertexBuffer>(verticesData.data(), verticesData.size() * sizeof(verticesData[0]));
+    platform->data->objectVBO->SetLayout(platform->data->bufferlayout);
+
+    platform->data->objectVAO = std::make_shared<VertexArray>();
+    platform->data->objectVAO->Bind();
+    platform->data->objectVAO->SetIndexBuffer(platform->data->objectIBO);
+    platform->data->objectVAO->AddVertexBuffer(platform->data->objectVBO);
+
+
+    m_platforms.push_back(platform);
+    m_platformsData.push_back(platform->data);
+
+    auto tetData = GeometricTools::CreateTetrahedron();
+
+    transform = glm::vec3(0.0f, 3.0f, 0.0f);
+    std::shared_ptr<Platform> platform2 = std::make_shared<Platform>();
+
+
+    auto& verticesData2 = tetData.first;
+    auto& indicesData2 = tetData.second;
+
+
+    platform2->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
+
+    // Create VAO and buffers using VertexBuffer and IndexBuffer classes
+    platform2->data->objectIBO = std::make_shared<IndexBuffer>(indicesData2.data(), indicesData2.size());
+    platform2->data->bufferlayout = BufferLayout({ {ShaderDataType::Float3, "position"}, {ShaderDataType::Float3, "normals"}, {ShaderDataType::Float2, "tcoords"}, {ShaderDataType::Float3, "color"} });
+
+    platform2->data->objectVBO = std::make_shared<VertexBuffer>(verticesData2.data(), verticesData2.size() * sizeof(verticesData2[0]));
+    platform2->data->objectVBO->SetLayout(platform2->data->bufferlayout);
+
+    platform2->data->objectVAO = std::make_shared<VertexArray>();
+    platform2->data->objectVAO->Bind();
+    platform2->data->objectVAO->SetIndexBuffer(platform2->data->objectIBO);
+    platform2->data->objectVAO->AddVertexBuffer(platform2->data->objectVBO);
+
+
+    m_platforms.push_back(platform2);
+    m_platformsData.push_back(platform2->data);
+
+
+    auto sData = GeometricTools::CreateSphere();
+
+    transform = glm::vec3(6.0f, 3.0f, 0.0f);
+    std::shared_ptr<Platform> platform3 = std::make_shared<Platform>();
+
+
+    auto& verticesData3 = sData.first;
+    auto& indicesData3 = sData.second;
+
+
+    platform3->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
+
+    // Create VAO and buffers using VertexBuffer and IndexBuffer classes
+    platform3->data->objectIBO = std::make_shared<IndexBuffer>(indicesData3.data(), indicesData3.size());
+    platform3->data->bufferlayout = BufferLayout({ {ShaderDataType::Float3, "position"}, {ShaderDataType::Float3, "normals"}, {ShaderDataType::Float2, "tcoords"}, {ShaderDataType::Float3, "color"} });
+
+    platform3->data->objectVBO = std::make_shared<VertexBuffer>(verticesData3.data(), verticesData3.size() * sizeof(verticesData3[0]));
+    platform3->data->objectVBO->SetLayout(platform3->data->bufferlayout);
+
+    platform3->data->objectVAO = std::make_shared<VertexArray>();
+    platform3->data->objectVAO->Bind();
+    platform3->data->objectVAO->SetIndexBuffer(platform3->data->objectIBO);
+    platform3->data->objectVAO->AddVertexBuffer(platform3->data->objectVBO);
+
+
+    m_platforms.push_back(platform3);
+    m_platformsData.push_back(platform3->data);
+
 }
 
 void Game::createFloor()
@@ -141,27 +182,15 @@ void Game::createFloor()
     auto& verticesData = GeometricTools::UnitSquare3DWithTexCoordsVertices;
     auto& indicesData = GeometricTools::UnitSquare3DWithTexCoordsIndices;
 
-    std::vector<float> vertices;
-    std::vector<unsigned int> indices;
-
     m_floor = std::make_shared<Floor>();
 
     m_floor->data->modelMatrix = MatrixOperations::getTransformedMatrix(scale, rotationVec, rotationDeg, transform);
 
-    for(float data : verticesData)
-    {
-        vertices.push_back(data);
-    }
-
-    for(float data : indicesData)
-    {
-        indices.push_back(data);
-    }
 
     // Create VAO and buffers using VertexBuffer and IndexBuffer classes
-    m_floor->data->objectIBO = std::make_shared<IndexBuffer>(indices.data(), indices.size());
+    m_floor->data->objectIBO = std::make_shared<IndexBuffer>(indicesData.data(), indicesData.size());
     m_floor->data->bufferlayout = BufferLayout({ {ShaderDataType::Float3, "position"}, {ShaderDataType::Float3, "normals"}, {ShaderDataType::Float2, "tcoords"}, {ShaderDataType::Float3, "color"} });
-    m_floor->data->objectVBO = std::make_shared<VertexBuffer>(vertices.data(), vertices.size() * sizeof(vertices[0]));
+    m_floor->data->objectVBO = std::make_shared<VertexBuffer>(verticesData.data(), verticesData.size() * sizeof(verticesData[0]));
     m_floor->data->objectVBO->SetLayout(m_floor->data->bufferlayout);
 
     m_floor->data->objectVAO = std::make_shared<VertexArray>();
